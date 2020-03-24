@@ -538,7 +538,7 @@
       try {
         // 1. Evaluate the variable
         var slot = variable.replace(re, '$1');
-
+        const slotArray = slot.split(".");
         // data must exist. Otherwise replace with blank
         if (data) {
           var func;
@@ -560,9 +560,10 @@
             // Function expression with explicit 'return' expression
             // Ordinary simple expression that
             // func = Function('with(this) {return (' + slot + ')}').bind(data);
-            func = (data) => { return data[slot]; };
+            // func = (data) => { return data[slot]; };
+            func = (p, o) => p.reduce((xs, x) => (xs && xs[x]) ? xs[x] : null, o);
           }
-          var evaluated = func(data);
+          var evaluated = func(slotArray,data);
           delete data.$root;  // remove $root now that the parsing is over
           if (evaluated) {
             // In case of primitive types such as String, need to call valueOf() to get the actual value instead of the promoted object
